@@ -9,11 +9,13 @@ import Modal from "../components/Model";
 import Card from "../components/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [area, setArea] = useState("No Location");
   const [todoCounts, setTodoCounts] = useState({
     totalTodos: 0,
     completedCount: 0,
@@ -59,6 +61,7 @@ const Dashboard = () => {
         }
       );
       setTodos(response.data.todos);
+      await location();
     } catch (error) {
       setError("Error fetching todos.");
       console.error("Error fetching todos:", error);
@@ -146,11 +149,26 @@ const Dashboard = () => {
     }
   };
 
+  const location = async () => {
+    try {
+      const response = await axios.get("/api/users/location");
+      setArea(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="min-h-screen min-w-screen px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
       <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 lg:p-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
           Dashboard
+        </h1>
+        <h1 className="flex h-fit w-fit justify-between items-center">
+          <div className=" text-red-500">
+            <LocationOnIcon />
+          </div>
+          <div className="text-xl ">{area}</div>
         </h1>
         <button
           className="flex items-center gap-2 p-2 mt-4 sm:mt-0 cursor-pointer text-red-700"
