@@ -25,7 +25,6 @@ const PrivateRoute = () => {
           );
 
           const userData = response.data.user;
-          console.log(userData);
           dispatch(setUser(userData));
         } else {
           dispatch(removeUser());

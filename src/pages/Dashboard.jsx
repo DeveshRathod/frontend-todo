@@ -27,12 +27,14 @@ const Dashboard = () => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
   const handleRequest = async (requestFn, withFetch = true) => {
+    if (isRequestInProgress) return;
+    setIsRequestInProgress(true);
     try {
       setLoading(true);
       await delay(3000);
-      console.log("request sent!");
       await requestFn();
 
       if (withFetch) {
@@ -44,6 +46,7 @@ const Dashboard = () => {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+      setIsRequestInProgress(false);
     }
   };
 
