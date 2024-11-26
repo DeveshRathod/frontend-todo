@@ -1,94 +1,71 @@
 import React, { useState } from "react";
-import Authwrapper from "../components/AuthWrapper";
+import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 import { setUser } from "../store/reducers/user.slice";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const Signin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-    setError("");
-  };
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.id]: e.target.value });
     setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch("/api/users/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/users/signin`,
+        credentials
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.user);
-        const temp = data.token;
-        localStorage.setItem("token", temp);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setEmail("");
-        setPassword("");
-        dispatch(setUser(data.user));
-        navigate("/dashboard");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.msg || "Signin failed");
-      }
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      dispatch(setUser(response.data.user));
+      setCredentials({ email: "", password: "" });
+      navigate("/dashboard");
     } catch (error) {
       console.error("Signin failed:", error.message);
-      setError("Signin failed. Please try again.");
+      setError(error.response?.data?.msg || "Signin failed. Please try again.");
     }
   };
 
   return (
-    <Authwrapper>
-      <div className="flex items-center flex-col gap-6">
-        <h1 className="font-semibold text-3xl text-[#33A013]">Sign In</h1>
+    <AuthWrapper>
+      <div className="flex flex-col items-center gap-6">
+        <h1 className="text-3xl font-semibold text-[#33A013]">Sign In</h1>
         <form
           onSubmit={handleSubmit}
-          className="flex items-center justify-center flex-col gap-4"
+          className="flex flex-col items-center gap-4 w-full md:w-96"
         >
-          <div className="relative">
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={handleEmailChange}
-              className="w-full md:w-96 px-4 py-3 rounded-md outline-none shadow-inner"
-              placeholder="Email"
-              required
-            />
-          </div>
-          <div className="relative">
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={handlePasswordChange}
-              className="w-full md:w-96 px-4 py-3 rounded-md outline-none shadow-inner"
-              placeholder="Password"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            id="email"
+            value={credentials.email}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-md outline-none shadow-inner"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            id="password"
+            value={credentials.password}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-md outline-none shadow-inner"
+            placeholder="Password"
+            required
+          />
           <button
             type="submit"
-            className="bg-[#33A013] text-white w-full p-3 border border-[#33A013] hover:border-[#33A013] rounded-md hover:bg-white hover:text-[#33A013] transition duration-300 ease-in-out"
+            className="w-full p-3 text-white bg-[#33A013] border border-[#33A013] rounded-md hover:bg-white hover:text-[#33A013] transition duration-300"
           >
             Sign In
           </button>
@@ -98,7 +75,7 @@ const Signin = () => {
               Not a user?{" "}
               <button
                 onClick={() => navigate("/signup")}
-                className="text-[#33A013] hover:underline focus:outline-none"
+                className="text-[#33A013] hover:underline"
               >
                 Sign Up
               </button>
@@ -106,7 +83,7 @@ const Signin = () => {
           )}
         </form>
       </div>
-    </Authwrapper>
+    </AuthWrapper>
   );
 };
 

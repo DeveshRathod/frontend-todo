@@ -9,13 +9,16 @@ const PrivateRoute = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
+
         if (token) {
           const response = await axios.post(
-            "/api/users/checkMe",
+            `${API_BASE_URL}/api/users/checkMe`,
             {},
             {
               headers: {

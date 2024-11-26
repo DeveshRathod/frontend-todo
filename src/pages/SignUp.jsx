@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import Authwrapper from "../components/AuthWrapper";
+import AuthWrapper from "../components/AuthWrapper";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 import { setUser } from "../store/reducers/user.slice";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -36,38 +39,27 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch("/api/users/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          confirmPassword: confirmPass,
-        }),
+      const response = await axios.post(`${API_BASE_URL}/api/users/signup`, {
+        email: email,
+        password: password,
+        confirmPassword: confirmPass,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setEmail("");
-        setPassword("");
-        dispatch(setUser(data.user));
-        navigate("/dashboard");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.msg || "Signup failed");
-      }
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      setEmail("");
+      setPassword("");
+      setConfirmPass("");
+      dispatch(setUser(response.data.user));
+      navigate("/dashboard");
     } catch (error) {
       console.error("Signup failed:", error.message);
-      setError("Signup failed. Please try again.");
+      setError(error.response?.data?.msg || "Signup failed. Please try again.");
     }
   };
 
   return (
-    <Authwrapper>
+    <AuthWrapper>
       <div className="flex items-center flex-col gap-6">
         <h1 className="font-semibold text-3xl text-[#33A013]">Sign Up</h1>
         <form
@@ -127,7 +119,7 @@ const Signup = () => {
           )}
         </form>
       </div>
-    </Authwrapper>
+    </AuthWrapper>
   );
 };
 

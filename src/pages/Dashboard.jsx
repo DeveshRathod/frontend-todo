@@ -13,6 +13,8 @@ import Loading from "../components/Loading";
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     const token = localStorage.getItem("token");
     const response = await axios.post(
-      "/api/todos/getDashboard",
+      `${API_BASE_URL}/api/todos/getDashboard`,
       {},
       {
         headers: {
@@ -67,7 +69,7 @@ const Dashboard = () => {
   const fetchTodos = async () => {
     const token = localStorage.getItem("token");
     const response = await axios.post(
-      "/api/todos/getTodos",
+      `${API_BASE_URL}/api/todos/getTodos`,
       {},
       {
         headers: {
@@ -113,7 +115,7 @@ const Dashboard = () => {
   const handleSubmitTodo = async (todoData) => {
     const token = localStorage.getItem("token");
     const requestFn = async () => {
-      await axios.post("/api/todos/addTodo", todoData, {
+      await axios.post(`${API_BASE_URL}/api/todos/addTodo`, todoData, {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -128,7 +130,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
     const requestFn = async () => {
       await axios.put(
-        `/api/todos/updateTodo`,
+        `${API_BASE_URL}/api/todos/updateTodo`,
         { id, ...updatedTodo },
         {
           headers: {
@@ -145,7 +147,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
     const requestFn = async () => {
       await axios.post(
-        `/api/todos/deleteTodo`,
+        `${API_BASE_URL}/api/todos/deleteTodo`,
         { id },
         {
           headers: {
@@ -160,7 +162,7 @@ const Dashboard = () => {
 
   const location = async () => {
     try {
-      const response = await axios.get("/api/users/location");
+      const response = await axios.get(`${API_BASE_URL}/api/users/location`);
       setArea(response.data);
     } catch (error) {
       console.log(error);
