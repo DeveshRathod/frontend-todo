@@ -5,8 +5,6 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setUser } from "../store/reducers/user.slice";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
 const Signin = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -21,10 +19,7 @@ const Signin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/users/signin`,
-        credentials
-      );
+      const response = await axios.post(`/api/users/signin`, credentials);
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));

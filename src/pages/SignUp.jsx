@@ -5,8 +5,6 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setUser } from "../store/reducers/user.slice";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +37,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/users/signup`, {
+      const response = await axios.post(`/api/users/signup`, {
         email: email,
         password: password,
         confirmPassword: confirmPass,
